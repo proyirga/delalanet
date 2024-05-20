@@ -58,7 +58,8 @@ export default function WithSubnavigation() {
                     <Image
                         cursor={"pointer"}
                         alt="logo"
-                        w={20}
+                        w={40}
+                        h={20}
                         src={colorMode === "dark" ? "/dark-logo-delalanet.png" : "/light-logo-delalanet.png"}
 
                     />
@@ -73,14 +74,7 @@ export default function WithSubnavigation() {
                     justify={'flex-end'}
                     direction={'row'}
                     spacing={6}>
-                    <Button
-                        as={'a'}
-                        fontSize={'sm'}
-                        fontWeight={400}
-                        variant={'link'}
-                        href={'#'}>
-                        Sign In
-                    </Button>
+                    
                     <Button
                         as={'a'}
                         display={{ base: 'none', md: 'inline-flex' }}
@@ -92,7 +86,7 @@ export default function WithSubnavigation() {
                         _hover={{
                             bg: 'green.300',
                         }}>
-                        Sign Up
+                        Sign In
                     </Button>
                 </Stack>
                 <Flex ml={3}>
@@ -256,25 +250,25 @@ const MobileNavItem = ({ label, children, href }) => {
 const NAV_ITEMS = [
     {
         label: 'Home',
-        href: '#',
+        href: '/',
     },
     {
-        label: 'Register',
+        label: 'Request Service',
         children: [
             {
-                label: 'Regiser as Delala',
-                subLabel: 'Work with us by advertising your stuff through DelalaNet.',
+                label: 'Rents',
+                subLabel: 'Rent a service or product through DelalaNet.',
                 href: '#',
             },
             {
-                label: 'Register as a Client',
+                label: 'Purchases',
                 subLabel: 'Buy a service or product of your interest through DelalaNet.',
                 href: '#',
             },
         ],
     },
     {
-        label: 'Employment',
+        label: 'Jobs',
         children: [
             {
                 label: 'Hire...',
@@ -289,7 +283,7 @@ const NAV_ITEMS = [
         ],
     },
     {
-        label: 'Rents',
+        label: 'Connect with Delalas',
         href: '#',
     },
     {
