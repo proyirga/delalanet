@@ -1,22 +1,25 @@
 import mongoose from "mongoose";
 
-const productOrServiceSchema = mongoose.Schema({
+const postSchema = mongoose.Schema({
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
     },
-    productName: {
+    title: {
         type: String,
         maxLength:50,
     },
     shortDescription: {
         type: String,
-        maxLength:50,
+        maxLength:250,
     },
-    category: {
-        type: String,
-        maxLength:50,
+    price: {
+        type: Number,
+    },
+    negotiable: {
+        type: Boolean,
+        default: false,
     },
     availability: {
         type: Boolean,
@@ -26,8 +29,9 @@ const productOrServiceSchema = mongoose.Schema({
         type: String,
     },
     likes: {
-        type: Number,
-        default:0,
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "User",
+        default: [],
     },
     replies: [
         {
@@ -54,6 +58,6 @@ const productOrServiceSchema = mongoose.Schema({
     timestamp: true,
 });
 
-const ProductOrService = mongoose.model("ProductOrService", productOrServiceSchema);
+const Post = mongoose.model("Post", postSchema);
 
-export default ProductOrService;
+export default Post;
