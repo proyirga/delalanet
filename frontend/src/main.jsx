@@ -1,11 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import {BrowserRouter} from "react-router-dom"
+import { BrowserRouter } from "react-router-dom"
 import { ChakraProvider, extendTheme, ColorModeScript } from '@chakra-ui/react'
 import { mode } from '@chakra-ui/theme-tools'
 import App from './App.jsx'
 import './index.css'
 import Header from './components/Header.jsx'
+import { RecoilRoot } from 'recoil'
 
 const styles = {
   global: (props) => ({
@@ -22,7 +23,7 @@ const config = {
 };
 const colors = {
   gray: {
-    light: '#616161',   
+    light: '#616161',
     dark: '#1e1e1e'
   }
 }
@@ -31,12 +32,14 @@ const theme = extendTheme({ config, styles, colors })
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
-    <ChakraProvider theme={theme}>
-    <ColorModeScript initialColorMode={theme.config.initialColorMode} />
-      <Header/>
-      <App />
-    </ChakraProvider>
-    </BrowserRouter>
+    <RecoilRoot>
+      <BrowserRouter>
+        <ChakraProvider theme={theme}>
+          <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+          <Header />
+          <App />
+        </ChakraProvider>
+      </BrowserRouter>
+    </RecoilRoot>
   </React.StrictMode>,
 )
