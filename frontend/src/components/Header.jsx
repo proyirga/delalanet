@@ -1,293 +1,96 @@
 import {
-    Box,
-    Flex,
-    Text,
-    IconButton,
-    Button,
-    Stack,
-    Collapse,
-    Icon,
-    Link,
-    Popover,
-    PopoverTrigger,
-    PopoverContent,
-    useColorModeValue,
-    //useBreakpointValue,
-    useDisclosure,
-    useColorMode,
-    Image,
+	Box,
+	Flex,
+	Link,
+	Button,
+	useColorModeValue,
+	Stack,
+	useColorMode,
+	Heading,
+	Avatar,
+	Menu,
+	MenuButton,
+	MenuList,
+	MenuItem,
+	MenuDivider,
 } from '@chakra-ui/react';
-import {
-    HamburgerIcon,
-    CloseIcon,
-    ChevronDownIcon,
-    ChevronRightIcon,
-    MoonIcon,
-    SunIcon,
-} from '@chakra-ui/icons';
+import { MoonIcon, SunIcon } from '@chakra-ui/icons';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { AiFillHome } from 'react-icons/ai';
+import { RxAvatar } from 'react-icons/rx';
+import { Link as RouterLink } from 'react-router-dom';
+import { FiLogOut } from 'react-icons/fi';
+import { BsFillChatQuoteFill } from 'react-icons/bs';
+import { MdOutlineSettings } from 'react-icons/md';
+import userAtom from '../atoms/userAtom';
+import authScreenAtom from '../atoms/authAtom';
+import useLogout from '../hooks/useLogout';
 
-export default function WithSubnavigation() {
-    const { isOpen, onToggle } = useDisclosure();
-    const { colorMode, toggleColorMode } = useColorMode();
-    return (
-        <Box>
-            <Flex
-                bg={useColorModeValue('white', 'gray.800')}
-                color={useColorModeValue('gray.600', 'white')}
-                minH={'60px'}
-                py={{ base: 2 }}
-                px={{ base: 4 }}
-                borderBottom={1}
-                borderStyle={'solid'}
-                borderColor={useColorModeValue('gray.200', 'gray.900')}
-                align={'center'}>
-                <Flex
-                    flex={{ base: 1, md: 'auto' }}
-                    ml={{ base: -2 }}
-                    display={{ base: 'flex', md: 'none' }}>
-                    <IconButton
-                        onClick={onToggle}
-                        icon={
-                            isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />
-                        }
-                        variant={'ghost'}
-                        aria-label={'Toggle Navigation'}
-                    />
-                </Flex>
-                <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
-                    <Image
-                        cursor={"pointer"}
-                        alt="logo"
-                        w={40}
-                        h={20}
-                        src={colorMode === "dark" ? "/dark-logo-delalanet.png" : "/light-logo-delalanet.png"}
 
-                    />
+export default function Header() {
+	const { colorMode, toggleColorMode } = useColorMode();
+	const user = useRecoilValue(userAtom);
+	const logout = useLogout();
+	const setAuthScreen = useSetRecoilState(authScreenAtom);
 
-                    <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
-                        <DesktopNav />
-                    </Flex>
-                </Flex>
+	return (
+		<>
+			<Box bg={useColorModeValue("gray.200", "#101010")} px={4}>
+				<Flex h={16} alignItems={'center'} justifyContent={'space-between'} fontWeight={"bold"}>
+					<Flex alignItems={'center'}>
+						{user ? (
+							<Link as={RouterLink} to="/">
+								<AiFillHome size={"50"} />
+							</Link>
+						) : (
+							<Link as={RouterLink} to="/auth" onClick={() => setAuthScreen('login')}>
+								Login
+							</Link>
+						)}
+					</Flex>
 
-                <Stack
-                    flex={{ base: 1, md: 0 }}
-                    justify={'flex-end'}
-                    direction={'row'}
-                    spacing={6}>
-                    
-                    <Button
-                        as={'a'}
-                        display={{ base: 'none', md: 'inline-flex' }}
-                        fontSize={'sm'}
-                        fontWeight={600}
-                        color={'white'}
-                        bg={'green.400'}
-                        href={'#'}
-                        _hover={{
-                            bg: 'green.300',
-                        }}>
-                        Sign In
-                    </Button>
-                </Stack>
-                <Flex ml={3}>
-                    <Button onClick={toggleColorMode}>
-                        {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-                    </Button>
-                </Flex>
-            </Flex>
+					<Heading>
+						DelalaNet
+					</Heading>
 
-            <Collapse in={isOpen} animateOpacity>
-                <MobileNav />
-            </Collapse>
-        </Box>
-    );
+					<Button onClick={toggleColorMode}>
+						{colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+					</Button>
+
+					<Flex alignItems={'center'}>
+						<Stack direction={'row'} spacing={7}>
+							{user ? (
+								<>
+									<Link as={RouterLink} to="/chat">
+										<BsFillChatQuoteFill size={50} />
+									</Link>
+									<Menu>
+										<MenuButton as={Button} rounded={'full'} variant={'link'} cursor={'pointer'}>
+											<Avatar size={'md'} src={user.profilePic} />
+										</MenuButton>
+										<MenuList>
+											<MenuItem as={RouterLink} to={`/${user.username}`}>
+												<RxAvatar size={20} /> Profile
+											</MenuItem>
+											<MenuItem as={RouterLink} to="/settings">
+												<MdOutlineSettings size={20} /> Settings
+											</MenuItem>
+											<MenuDivider />
+											<MenuItem onClick={logout}>
+												<FiLogOut size={20} /> Logout
+											</MenuItem>
+										</MenuList>
+									</Menu>
+								</>
+							) : (
+								<Link as={RouterLink} to="/auth" onClick={() => setAuthScreen('signup')}>
+									Sign up
+								</Link>
+							)}
+						</Stack>
+					</Flex>
+				</Flex>
+			</Box>
+		</>
+	);
 }
-
-const DesktopNav = () => {
-    const linkColor = useColorModeValue('gray.600', 'gray.200');
-    const linkHoverColor = useColorModeValue('gray.800', 'white');
-    const popoverContentBgColor = useColorModeValue('white', 'gray.800');
-
-    return (
-        <Stack direction={'row'} spacing={4} mt={4}>
-            {NAV_ITEMS.map((navItem) => (
-                <Box key={navItem.label}>
-                    <Popover trigger={'hover'} placement={'bottom-start'}>
-                        <PopoverTrigger>
-                            <Link
-                                p={2}
-                                href={navItem.href ?? '#'}
-                                fontSize={'sm'}
-                                fontWeight={500}
-                                color={linkColor}
-                                _hover={{
-                                    textDecoration: 'none',
-                                    color: linkHoverColor,
-                                }}>
-                                {navItem.label}
-                            </Link>
-                        </PopoverTrigger>
-
-                        {navItem.children && (
-                            <PopoverContent
-                                border={0}
-                                boxShadow={'xl'}
-                                bg={popoverContentBgColor}
-                                p={4}
-                                rounded={'xl'}
-                                minW={'sm'}>
-                                <Stack>
-                                    {navItem.children.map((child) => (
-                                        <DesktopSubNav key={child.label} {...child} />
-                                    ))}
-                                </Stack>
-                            </PopoverContent>
-                        )}
-                    </Popover>
-                </Box>
-            ))}
-        </Stack>
-    );
-};
-
-const DesktopSubNav = ({ label, href, subLabel }) => {
-    return (
-        <Link
-            href={href}
-            role={'group'}
-            display={'block'}
-            p={2}
-            rounded={'md'}
-            _hover={{ bg: useColorModeValue('green.50', 'gray.900') }}>
-            <Stack direction={'row'} align={'center'}>
-                <Box>
-                    <Text
-                        transition={'all .3s ease'}
-                        _groupHover={{ color: 'green.400' }}
-                        fontWeight={500}>
-                        {label}
-                    </Text>
-                    <Text fontSize={'sm'}>{subLabel}</Text>
-                </Box>
-                <Flex
-                    transition={'all .3s ease'}
-                    transform={'translateX(-10px)'}
-                    opacity={0}
-                    _groupHover={{ opacity: '100%', transform: 'translateX(0)' }}
-                    justify={'flex-end'}
-                    align={'center'}
-                    flex={1}>
-                    <Icon color={'green.400'} w={5} h={5} as={ChevronRightIcon} />
-                </Flex>
-            </Stack>
-        </Link>
-    );
-};
-
-const MobileNav = () => {
-    return (
-        <Stack
-            bg={useColorModeValue('white', 'gray.800')}
-            p={4}
-            display={{ md: 'none' }}>
-            {NAV_ITEMS.map((navItem) => (
-                <MobileNavItem key={navItem.label} {...navItem} />
-            ))}
-        </Stack>
-    );
-};
-
-const MobileNavItem = ({ label, children, href }) => {
-    const { isOpen, onToggle } = useDisclosure();
-
-    return (
-        <Stack spacing={4} onClick={children && onToggle}>
-            <Flex
-                py={2}
-                as={Link}
-                href={href ?? '#'}
-                justify={'space-between'}
-                align={'center'}
-                _hover={{
-                    textDecoration: 'none',
-                }}>
-                <Text
-                    fontWeight={600}
-                    color={useColorModeValue('gray.600', 'gray.200')}>
-                    {label}
-                </Text>
-                {children && (
-                    <Icon
-                        as={ChevronDownIcon}
-                        transition={'all .25s ease-in-out'}
-                        transform={isOpen ? 'rotate(180deg)' : ''}
-                        w={6}
-                        h={6}
-                    />
-                )}
-            </Flex>
-
-            <Collapse in={isOpen} animateOpacity style={{ marginTop: '0!important' }}>
-                <Stack
-                    mt={2}
-                    pl={4}
-                    borderLeft={1}
-                    borderStyle={'solid'}
-                    borderColor={useColorModeValue('gray.200', 'gray.700')}
-                    align={'start'}>
-                    {children &&
-                        children.map((child) => (
-                            <Link key={child.label} py={2} href={child.href}>
-                                {child.label}
-                            </Link>
-                        ))}
-                </Stack>
-            </Collapse>
-        </Stack>
-    );
-};
-
-const NAV_ITEMS = [
-    {
-        label: 'Home',
-        href: '/',
-    },
-    {
-        label: 'Request Service',
-        children: [
-            {
-                label: 'Rents',
-                subLabel: 'Rent a service or product through DelalaNet.',
-                href: '#',
-            },
-            {
-                label: 'Purchases',
-                subLabel: 'Buy a service or product of your interest through DelalaNet.',
-                href: '#',
-            },
-        ],
-    },
-    {
-        label: 'Jobs',
-        children: [
-            {
-                label: 'Hire...',
-                subLabel: 'Hire a person or campany',
-                href: '#',
-            },
-            {
-                label: 'Be hired',
-                subLabel: 'Check out available opportunities that might interest you.',
-                href: '#',
-            },
-        ],
-    },
-    {
-        label: 'Connect with Delalas',
-        href: '#',
-    },
-    {
-        label: 'Contact Us',
-        href: '#',
-    },
-];

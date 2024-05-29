@@ -1,81 +1,125 @@
-import { PhoneIcon } from "@chakra-ui/icons"
-import { Avatar, Box, Button, Flex, Image, Menu, MenuButton, MenuItem, MenuList, Portal, Text, VStack, useToast } from "@chakra-ui/react"
-import { CgMoreO } from "react-icons/cg"
-import { Link } from "react-router-dom"
-const UserHeader = () => {
-    const toast = useToast()
-    const copyURL = () => {
-        const currentURL = window.location.href;
-        navigator.clipboard.writeText(currentURL).then(() => {
-            toast({
-                title: 'Profile Link.',
-                description: "Profile link copied.",
-                status: 'success',
-                duration: 3000,
-                isClosable: true,
-            })
-        });
-    };
-    return (
-        <VStack gap={4} alignItems={"start"}>
-            <Flex justifyContent={"space-between"} w={"full"}>
-                <Box>
-                    <Flex>
-                        <Text fontSize={"2xl"} fontWeight={"bold"}>Nilay Patel</Text>
-                        <Image src="verified.png" w={4} h={4} mt={3} />
-                    </Flex>
-                    <Flex gap={2} alignItems={"center"}>
-                        <Text fontSize={"sm"}>Delala</Text>
-                        <PhoneIcon mt={2} borderRadius={"full"} />
-                    </Flex>
-                </Box>
-                <Box>
-                    <Avatar name="Nilay Patel" src="https://bit.ly/ryan-florence" size={
-                        {
-                            base: "md",
-                            md: "xl"
-                        }
-                    } />
-                </Box>
-            </Flex>
-            <Text>Delala, Specializing in automobiles sales and rents</Text>
-            <Flex w={"full"} justifyContent={"space-between"}>
-                <Flex gap={2} alignItems={"center"}>
-                    <Text color={"gray.light"}>3.2k successful sales</Text>
-                    <Box w={1} h={1} bg={"gray.light"} borderRadius={"full"}></Box>
-                    <Link color={"gray.light"}>⭐⭐⭐⭐⭐</Link>
-                </Flex>
-                <Flex>
-                    <Box className="icon-container">
-                       <Button mr={3}>Follow</Button>
-                    </Box>
-                    <Box className="icon-container">
-                        <Menu>
-                            <MenuButton>
-                                <CgMoreO size={24} cursor={"pointer"} />
-                            </MenuButton>
-                            <Portal>
-                                <MenuList bg={"gray.dark"}>
-                                    <MenuItem bg={"gray.dark"} onClick={copyURL}>Copy Link</MenuItem>
-                                </MenuList>
-                            </Portal>
-                        </Menu>
-                    </Box>
-                </Flex>
-            </Flex>
-            <Flex w={"full"}>
-                <Flex flex={1} borderBottom={"1.5px solid white"} justifyContent={"center"} pb={3} cursor={"pointer"}>
-                    <Text fontWeight={"bold"}>Active lists (3)</Text>
-                </Flex>
-                <Flex flex={1} borderBottom={"1px solid gray"} justifyContent={"center"} pb={3} cursor={"pointer"} color={"gray.light"}>
-                    <Text fontWeight={"bold"}>Sold(20)</Text>
-                </Flex>
-                <Flex flex={1} borderBottom={"1px solid gray"} justifyContent={"center"} pb={3} cursor={"pointer"} color={"gray.light"}>
-                    <Text fontWeight={"bold"}>Archived(1)</Text>
-                </Flex>
-            </Flex>
-        </VStack>
-    )
-}
+import { Avatar } from "@chakra-ui/avatar";
+import { Box, Flex, Link, Text, HStack, VStack } from "@chakra-ui/layout";
+import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/menu";
+import { Portal } from "@chakra-ui/portal";
+import { CgMoreO } from "react-icons/cg";
+import { useRecoilValue } from "recoil";
+import userAtom from "../atoms/userAtom";
+import { Link as RouterLink } from "react-router-dom";
+import useFollowUnfollow from "../hooks/useFollowUnfollow";
+import useToastHook from "../hooks/useToastHook";
+import { Button } from "@chakra-ui/react";
+import { MdOutlineSettings } from "react-icons/md";
+import { CiLocationOn } from "react-icons/ci";
+import { IoMdStar } from "react-icons/io";
 
-export default UserHeader
+const UserHeader = ({ user }) => {
+	const showToast = useToastHook();
+	const currentUser = useRecoilValue(userAtom);
+	const { handleFollowUnfollow, following, updating } = useFollowUnfollow(user);
+
+	const copyURL = () => {
+		const currentURL = window.location.href;
+		navigator.clipboard.writeText(currentURL).then(() => {
+			showToast("Success", "Link copied to clipboard.", "success");
+		});
+	};
+	return (
+		<VStack gap={4} alignItems={"start"}>
+			<Flex justifyContent={"space-between"} w={"full"}>
+				<Box>
+					<Text fontSize={"2xl"} fontWeight={"bold"}>
+						{user.name}
+					</Text>
+					<Flex gap={2} alignItems={"center"}>
+						<Text fontSize={"sm"}>{user.location}</Text>
+						<CiLocationOn size={25}/>
+					</Flex>
+				</Box>
+				<Box>
+					{user.profilePic && (
+						<Avatar
+							name={user.name}
+							src={user.profilePic}
+							size={{
+								base: "md",
+								md: "xl",
+							}}
+						/>
+					)}
+					{!user.profilePic && (
+						<Avatar
+							name={user.name}
+							src='https://bit.ly/broken-link'
+							size={{
+								base: "md",
+								md: "xl",
+							}}
+						/>
+					)}
+				</Box>
+			</Flex>
+
+			<Text>{user.bio}</Text>
+
+			{currentUser?._id === user._id && (
+				<Link as={RouterLink} to='/update'>
+					<HStack>
+					<Button size={"sm"}>Update Profile</Button>
+					<Link as={RouterLink} to="/settings">
+						<MdOutlineSettings size={20} />
+					</Link>
+					</HStack>
+				</Link>
+			)}
+			{currentUser?._id !== user._id && (
+				<Button size={"sm"} onClick={handleFollowUnfollow} isLoading={updating}>
+					{following ? "Unfollow" : "Follow"}
+				</Button>
+			)}
+			<Flex w={"full"} justifyContent={"space-between"}>
+				<Flex gap={2} alignItems={"center"}>
+					
+					<IoMdStar /><IoMdStar /><IoMdStar /><IoMdStar /><IoMdStar />
+					<Box w='1' h='1' bg={"gray.light"} borderRadius={"full"}></Box>
+					<Link color={"green.light"}>See feedbacks given by your clients</Link>
+				
+				</Flex>
+				<Flex>
+					<Box className='icon-container'>
+						<Menu>
+							<MenuButton>
+								<CgMoreO size={24} cursor={"pointer"} />
+							</MenuButton>
+							<Portal>
+								<MenuList bg={"gray.dark"}>
+									<MenuItem bg={"gray.dark"} onClick={copyURL}>
+										Copy link
+									</MenuItem>
+								</MenuList>
+							</Portal>
+						</Menu>
+					</Box>
+				</Flex>
+			</Flex>
+
+			<Flex w={"full"}>
+				<Flex flex={1} borderBottom={"1.5px solid white"} justifyContent={"center"} pb={3} cursor={"pointer"}>
+					<Text fontWeight={"bold"}> Current Items</Text>
+				</Flex>
+				<Flex
+					flex={1}
+					borderBottom={"1px solid gray"}
+					justifyContent={"center"}
+					color={"gray.light"}
+					pb={3}
+					cursor={"pointer"}
+				>
+					<Text fontWeight={"bold"}> Inactive Items</Text>
+				</Flex>
+			</Flex>
+		</VStack>
+	);
+};
+
+export default UserHeader;
